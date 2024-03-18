@@ -79,5 +79,38 @@ Any of these are equally likely to appear on exams. However, many of these rely 
 
 Now, for some more detail on each of those functions found above:
 
+### On `fork()`:
+Remember that the `fork()` function creates an entirely new process, but with a context **identical** to the current one, with the exception of whatever PID variable you're using. 
+
+This new child process it spawns will be **ISOLATED** from the current process at its creation, unless you've used `pipe()` just beforehand. 
+
+The child process will then begin running the same program as the parent from the exact line you called fork on; so `fork()` essentially returns twice.
+
+Note that in Linux, it just so happens that the child process will always have `fork()` return `0`. This is how we can actually tell the parent and child processes apart; that's what we're checking for whenever we do the `if (fork() == 0)` (or some equivalent statement) line in code.
+
+As you might've noticed, this tends to lead to a distinct `if () {...} else if () {...}` pattern when we write code around `fork()`. One important thing I'd like to point out regarding this pattern - most times when you see it in class, we include something like this:
+```
+int pid = fork();
+if (pid < 0) {
+    perror("fork error");
+    exit(1);
+}
+```
+But what does this really even mean? Shouldn't `fork()` always return 0 or a positive number? The answer is 99% of the time, it will. But if `fork()` causes an error, I think you'd like to know sooner than later. `fork()` will return a negative value if an error occurs, and you should exit if that is the case, otherwise you may end up with some very bad process behavior. 
+
+Continuing on that example, you'll want to make sure that the child process exits:
+```
+} else if (pid == 0) {
+    // do something...
+    exit(<some exit code>);
+} else {
+    // parent code
+}
+```
+If you don't ensure the child process exits, it may end up running whatever code is located after your `if () {...} else if () {...}` block, which is not good. That's why we always suggest the parent calls `wait()`, because it'll be more obvious if the child process doesn't exit properly. (It also helps ensure you don't end up with zombies!)
+
+### On the `exec(...)` family of functions
+
+
 
 
