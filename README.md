@@ -57,7 +57,7 @@ In general, for the two parts you'll experience, you should anticipate getting o
 - Part 2: A little more advanced. You'll need to get this correct to earn an A.
 - Part 3: This only sometimes appears, but it will be for extra credit if it does.
 
-Note that both parts contribute to your overall Exam 1 grade, so make sure you are comfortable with all of the potential topics that can appear. 
+Note that both parts contribute to your overall Exam 1 grade, so make sure you are comfortable with all of the potential topics that can appear. If you get an A on one day of the exam, but completely fail the other part, the most you would be elgible for is a 100/200. Do your best!
 
 An additional thing to note - you'll be connecting to a remote server for this exam. Namely, you'll be using `ssh` to connect to a machine other than your own. 
 
@@ -68,6 +68,10 @@ Also, you get access to Linux man pages. They do tell you helpful information!
 <a id="content_notes"></a>
 
 ## *Content* Notes
+This is the section where I yap on and on about certain function calls you've seen. If you don't feel like seeing what I have to yap about, please skip ahead to the practice problems. 
+
+If you do feel like looking at my notes on these things, maybe you'll learn something new. 
+
 The topics you are expected to know for this exam are roughly as follows:
 - Using `fork()` to create & effectively use multiple processes
 - The `exec(...)` family of functions
@@ -106,10 +110,46 @@ Continuing on that example, you'll want to make sure that the child process exit
 } else {
     // parent code
 }
+// also parent code, if child exits.
 ```
 If you don't ensure the child process exits, it may end up running whatever code is located after your `if () {...} else if () {...}` block, which is not good. That's why we always suggest the parent calls `wait()`, because it'll be more obvious if the child process doesn't exit properly. (It also helps ensure you don't end up with zombies!)
 
 ### On the `exec(...)` family of functions
+It is **VERY** important to note that exec will replace the **CURRENT** process with whatever else you are attempting to `exec`. This is why you usually see any `exec()` calls paired with a `fork()` call just before it - otherwise we just throw out the code we're attempting to run, which defeats the point. That's not to say that couldn't be the point of a program, but we typically don't have you throw away the code you're writing in this class. 
+
+Much like with `fork()`, we suggest you error-check any `exec()` calls you make by simply throwing a `perror("<msg>")` and `exit(<some exit code>)` call **AFTER** the `exec()` call - something like this:
+```
+// some code here...
+exec(...);
+perror("exec failed, something bad is happening!");
+exit(EXIT_FAILURE);
+// ...
+```
+Since `exec` generally relies on the other process exiting normally, if you manage to reach the `perror` afterwards, you know something went wrong, and can make that process exit on your accord instead of creating a zombie process. 
+
+Also, let's take a brief look at the function signatures specified in the Linux man page:
+```
+int execl(const char *pathname, const char *arg, ..., (char *) NULL);
+int execlp(const char *file, const char *arg, ..., (char *) NULL);
+int execv(const char *pathname, char *const argv[]);
+int execvp(const char *file, char *const argv[]);
+```
+Note that `execl` and `execlp` have this weird syntax that says `const char *arg, ...,`, that just means you can have 1 or more args. You also have the NULL padding on the end; note that `execv` and `execvp` also expect that NULL, it just has to be the last thing in the array.
+
+It is VERY important that you cast all of your values to `char*`'s before you call `exec` in any form; as it tries to execute the commands just like you do on the command line, and most programs treat those as strings. If you're unsure on how to cast anything to a char*, you can usually do the following:
+```
+char mybuf[128];
+sprintf(mybuf, "my number: %d", 12);
+```
+`sprintf` will copy the formatted string provided (in my case, `"my number: %d"`), fill it in using the standard C string formatting rules (so the thing becomes `"my number: 12"`) and then puts it into the char buffer provided as the first argument. So if I were to print out what's in the buffer later:
+```
+printf("%s\n", mybuf)
+my number: 12
+```
+I'd just get whatever I put in the buffer. Make sure you're using the appropriate string formatting tools to put your data types in, though. 
+
+Some constraints: make sure your buffer is actually long enough to hold onto the message you're trying to put in there. Things will probably break otherwise. 
+
 
 
 
