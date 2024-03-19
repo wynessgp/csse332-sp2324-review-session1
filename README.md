@@ -35,7 +35,6 @@ Reminder that these links will only work if you're viewing this in a markdown re
 [Content Notes](#content_notes) <br>
 [Problem 1](#problem_one) <br>
 [Problem 2](#problem_two) <br>
-[Problem 3](#problem_three) <br>
 
 <a id="admin_notes"></a>
 
@@ -256,9 +255,9 @@ There are two files that go with this problem: `scout.c` and `report.c`. You wil
 
 Your code for `scout.c` is to try and generate a lucky scout N times (where N is the input to the program) to send out on a scouting mission. A lucky scout will be any child process you generate that has a pid divisible by `7`. 
 
-This lucky scout is then to make a report that it will **HOPEFULLY** bring back to you at some point in the future. This means that the lucky scout is to execute `./report.bin <scout's pid>`, and you are to eventually determine what that report (exit code) means for you. (Look at the comments in `report.c`, those are what you will want to print). 
+This lucky scout is then to make a report that it will **HOPEFULLY** bring back to you at some point in the future. This means that the lucky scout is to execute `./report.bin <scout's pid>`, and you are to eventually determine what that report (exit code) means for you. (Look at the comments in `report.c`, those are what you will want to print). You should be able to do this without creating **ANY** zombie processes.
 
-Additionally, all of your lucky scouts should be able to go out on missions at the same time (needs to be parallelized). Once one of them exits (or crashes!), your parent process should immediately reveal what the associated report information was. 
+Additionally, all of your lucky scouts should be able to go out on missions at the same time (needs to be parallelized). Once one of them exits (or crashes!), your parent process should reveal what the associated report information was. 
 
 In order to get the scout's PID, you'll likely need to use `getpid()`.
 
@@ -303,13 +302,99 @@ Oh tragic day! The scout never returned!
 Useless! The scout came back empty handed...
 We're rich! The scout found treasure!
 ```
-Note that the line with `$` is me entering the command to start the program.
+Note that the line with `$ ./scout.bin 77` is me entering the command to start the program.
 
 <a id="problem_two"></a>
 
+## Problem Two: [Chaos in the Armory](armory.c)
+Length: Medium <br>
+Objective: Use `fork()` in conjunction with `pipe()` to communicate with *multiple* child processes at once. <br>
+Files to modify: `armory.c` <br>
 
+## Description:
+Everything was going fine one day in your camp until the armory suddenly caught on fire. You hear people outside your tent yelling:
 
+"Fire! Fire! Save the armory!" 
 
-<a id="problem_three"></a>
+If you lose those weapons, you're going to be in a lot of trouble. Without much of a thought, you rush into the burning building, past the crowd of soldiers gathering around it. 
+
+Luckily for you, the section of the armory you're in isn't burning yet, though you guess that you probably don't have much time. You turn around and see some of your personal guards have followed you in. 
+
+"Okay, here's the plan. You lot are to split into groups of 4 and save some of the weapons in this section of the armory." You say, and they all nod. "I want you, you, and you to be the ones grabbing weapons out of the piles, and the rest of you are to drag them away after the leader of each group hands you one." 
+
+They all nod in agreement and split up to go to the various corners of the room, working diligently to save what they can, under your diligent oversight.
+
+## Implementation:
+This one will be a bit trickier to model. For simplicity's sake, imagine that you are the process that calls `./armory.bin`, AKA the **MAIN** process. The leader of each small group will be another process; and the people working to transport the weapons out of the armory are yet another process. To give you a rough idea of what I'm aiming for here, let me give you a little diagram:
+```
+                                            Main Process
+                                    /            |          \
+                                /                |                \
+                            Leader 1          Leader 2          Leader 3
+                           /    |    \       /   |    \        /   |    \
+                          /     |     \     /    |     \      /    |     \
+                         S1    S2     S3   S1    S2    S3    S1    S2    S3
+```
+I intend for you to read this diagram from the top down. The main process has 3 child processes:
+- Leader 1
+- Leader 2
+- Leader 3
+
+Each Leader process, subsequently, has child processes:
+- S1
+- S2
+- S3
+
+The leader must be able to communicate, via pipe, with all three (per example) of its child processes.
+
+Additionally, the main process should wait for each Leader to finish; printing out when they do. 
+
+Here are some `#define` statements I've thrown at the top of the file that you'll need to use to determine how long each process must stay alive for:
+```
+#define NUM_LEADERS 3
+#define NUM_SOLDIERS 3
+#define NUM_WEAPONS_PER_SOLIDER 2
+...
+```
+(Note that by the hierarchy above, Leaders stay in their respective place; Soldiers will be the S~ layer you see below them). 
+
+Each Leader must direct their respective soliders to pick up `NUM_WEAPONS_PER_SOLIDER` weapons; by putting the respective weapon's number in the pipe. (Think about how many times they must do this). 
+
+So if I was a leader telling a soldier to pick up the first weapon, I'd just write the number `1` into the pipe. 
+
+In order to represent writing a message into the pipe, you should print out:
+```
+Leader <leader PID> says to retrieve weapon <weapon number>!
+```
+Note that it doesn't matter which solider gets to retrieve the weapon first (namely, who reads first), it just matters that some soldier gets it. Once a soldier retrieves the weapon, they should print out:
+```
+Soldier <soldier PID> retrieved weapon <weapon number>!
+```
+And then they should sleep for `2` seconds to model them taking it out of the army. 
+
+Once any soldier retrieves `NUM_WEAPONS_PER_SOLIDER`, they should print out:
+```
+Soldier <soldier PID> has retrieved the alotted amount of weapons!
+```
+And then prompty exit.
+
+Once a leader has supervised handed out all of their orders on weapons to retrieve, they should promptly exit, printing the message:
+```
+Leader <leader PID>'s job is done here!
+```
+Just before they exit.
+
+Finally, come back up to our main process, once we've confirmed that a Leader has left, we should print out:
+```
+Main Process <main process PID> has confirmed that Leader <leader PID> left the armory!
+```
+While there are a couple of different ways to achieve these print outs, I am going to strictly enforce this hierarchy for the sake of this problem. None of your processes should exit before they finish their job, and you should have **NO** zombies after the program is done running. 
+
+Like the other problems, you can use `make` to generate `./armory.bin`, which is what you'll need to use in order to run the program. Here's some sample output from me running it:
+```
+$ ./armory.bin
+
+```
+
 
 
