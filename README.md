@@ -234,5 +234,82 @@ Also, remember your macros to get the exit status from a process - things like `
 
 [Link back to TOC](#toc)
 
+### Problems
+Ok, enough rambling. Let's get to the actual content you're likely here for.
+
+<a id="problem_one"></a>
+
+## Problem 1: [Scouting Parties](scout.c)
+Length: Medium <br>
+Objective: Use `fork()` in conjunction with `exec(...)`, and exit codes. <br>
+Files to modify: `scout.c` <br>  
+
+### Description:
+Suppose that you are the manager of a Medieval era war camp. Your country is currently fighting a brutal campaign against your enemy and you need all of the information you can get on them. For whatever reason, you find yourself in your tent late at night, and an idea strikes you - why not send out some scouting parties and have them report back to you?
+
+"What a great idea!" you think to yourself. But who do you pick to send out on this scouting party? You look over the list of soldiers you have in your camp. You decide on sending out every 7th soldier you have on your list, because that should bring your scouts good luck out in the field. You go to bed with a smile on your face, and mentally prepare yourself to start sending them out tomorrow.
+
+That's enough storytelling for now. Let's return to the land of ~~pain~~ C coding and attempt to model this problem. 
+
+### Implementation Details:
+There are two files that go with this problem: `scout.c` and `report.c`. You will not need to modify `report.c` at all, but you will want to take a look at what it is doing to figure out the various exit codes it gives out. 
+
+Your code for `scout.c` is to try and generate a lucky scout N times (where N is the input to the program) to send out on a scouting mission. A lucky scout will be any child process you generate that has a pid divisible by `7`. 
+
+This lucky scout is then to make a report that it will **HOPEFULLY** bring back to you at some point in the future. This means that the lucky scout is to execute `./report.bin <scout's pid>`, and you are to eventually determine what that report (exit code) means for you. (Look at the comments in `report.c`, those are what you will want to print). 
+
+Additionally, all of your lucky scouts should be able to go out on missions at the same time (needs to be parallelized). Once one of them exits (or crashes!), your parent process should immediately reveal what the associated report information was. 
+
+In order to get the scout's PID, you'll likely need to use `getpid()`.
+
+Note that in order to appropriately call `./report.bin <pid>` from the lucky scout's process, you'll need to convert the pid into a string - you can do so with `sprintf`:
+```
+char scout_pid[32];
+sprintf(scout_pid, "%d", <pid>);
+```
+And this will store their PID in `scout_pid`. You'll want to use that as an argument to `exec`. 
+
+Additionally, the correct way to execute `scout.bin` is:
+```
+$ ./scout.bin N
+```
+Where N is some integer of your choosing - try to make it somewhat high, but no more than 300 reasonably speaking. 
+
+Also, it is OK to hold onto all of the pids you generate - just make sure that if the process is not a lucky one, that you make it `exit()` with a code that doesn't overlap with what `report.c` has.
+
+You can generate both `./report.bin` and `./scout.bin` by typing `make` in your practice exam's directory. If you would like to try to match my output, here's an example of running the program:
+```
+$ ./scout.bin 77
+Scout 2282 is leaving the camp!
+Scout 2289 is leaving the camp!
+Scout 2296 is leaving the camp!
+Scout 2303 is leaving the camp!
+Scout 2310 is leaving the camp!
+Scout 2317 is leaving the camp!
+Scout 2324 is leaving the camp!
+Scout 2331 is leaving the camp!
+Scout 2338 is leaving the camp!
+Scout 2345 is leaving the camp!
+Scout 2352 is leaving the camp!
+Ambush! Someone followed the scout!
+Ambush! Someone followed the scout!
+We're rich! The scout found treasure!
+Oh tragic day! The scout never returned!
+Ambush! Someone followed the scout!
+Useless! The scout came back empty handed...
+Ambush! Someone followed the scout!
+Ambush! Someone followed the scout!
+Oh tragic day! The scout never returned!
+Useless! The scout came back empty handed...
+We're rich! The scout found treasure!
+```
+Note that the line with `$` is me entering the command to start the program.
+
+<a id="problem_two"></a>
+
+
+
+
+<a id="problem_three"></a>
 
 
