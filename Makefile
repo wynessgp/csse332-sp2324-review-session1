@@ -1,4 +1,4 @@
-all: report.bin scout.bin
+all: report.bin scout.bin armory.bin
 
 CFLAGS+=-Wall 
 
