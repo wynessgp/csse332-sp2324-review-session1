@@ -187,6 +187,16 @@ Additionally, note that you need to be careful about how many bytes you write/re
 
 This is why we usually recommend reading and writing the same amount of bytes in your calls. 
 
+### On using `signal()`
+Signal does not have as many complexities to it as some of the other functions that you'll use here. Remember that in order to properly use it, you'll need to provide it with:
+```
+signal(<signal type>, signal_handler);
+```
+Where `signal_handler` is some void function you define earlier in the file. 
+
+When you are using `signal`, make sure you are 100% aware of WHEN Linux generates the signal that you choose to put in the function call. To briefly go back to the process lab for an example, we had you look at the man page for `alarm(...)`. Alarm would take in an integer argument, and after that many seconds, it would deliver a `SIGALRM` signal. You would need to use signal to appropriately catch that, and allow for test cases to effectively timeout.
+
+You might also know about the `SIGSEGV` signal, which is a signal that is generated when a segmentation violation (more commonly, a segfault) occurs. Note that a segfault occurs when you try to access an invalid memory location; so it isn't technically 100% sufficient for handling crashes. A crash occurs whenever a program fails to exit altogether - this means things like memory leaks, stack smashing, etc. 
 
 
 
