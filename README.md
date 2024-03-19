@@ -7,7 +7,7 @@ mkdir <directory name>
 ```
 Once you've done that, go ahead and cd into the directory. Then, you'll want to go ahead and run the following command:
 ```
-git clone git@github.com:wynessgp/git@github.com:wynessgp/csse332-sp2324-review-session1.git
+git clone git@github.com:wynessgp/csse332-sp2324-review-session1.git
 ```
 And that should go ahead and move all of the files over to your WSL. My suggestion is you keep all the review sessions material in this directory, as they'll be nicely organized. Note that you could also just directly clone this repo from your home directory, and the file that comes out of that will just be the repo's name. 
 
