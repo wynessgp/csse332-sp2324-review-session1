@@ -73,17 +73,19 @@ This is the section where I yap on and on about certain function calls you've se
 If you do feel like looking at my notes on these things, maybe you'll learn something new. 
 
 The topics you are expected to know for this exam are roughly as follows:
-- Using `fork()` to create & effectively use multiple processes
-- The `exec(...)` family of functions
-- Using `pipe(...)` to effectively communicate info between processes
-- Using `signal()` to register signal handlers
-- Using `wait()`, `waitpid()` to make sure child processes exit properly
+- [Using `fork()` to create & effectively use multiple processes](#fork_notes)
+- [The `exec(...)` family of functions](#exec_notes)
+- [Using `pipe(...)` to effectively communicate info between processes](#pipe_notes)
+- [Using `signal()` to register signal handlers](#signal_notes)
+- [Using `wait()`, `waitpid()`, `exit()` to make sure child processes exit properly](#wait_notes)
 
 Any of these are equally likely to appear on exams. However, many of these rely on utilizing `fork()` to actually have any useful behavior, so make sure you are especially comfortable with what `fork()` does. 
 
 Now, for some more detail on each of those functions found above:
 
-### On `fork()`:
+<a id="fork_notes"></a>
+
+## On `fork()`:
 Remember that the `fork()` function creates an entirely new process, but with a context **identical** to the current one, with the exception of whatever PID variable you're using. 
 
 This new child process it spawns will be **ISOLATED** from the current process at its creation, unless you've used `pipe()` just beforehand. 
@@ -114,7 +116,11 @@ Continuing on that example, you'll want to make sure that the child process exit
 ```
 If you don't ensure the child process exits, it may end up running whatever code is located after your `if () {...} else if () {...}` block, which is not good. That's why we always suggest the parent calls `wait()`, because it'll be more obvious if the child process doesn't exit properly. (It also helps ensure you don't end up with zombies!)
 
-### On the `exec(...)` family of functions
+[Link back to TOC](#toc)
+
+<a id="exec_notes"></a>
+
+## On the `exec(...)` family of functions:
 It is **VERY** important to note that exec will replace the **CURRENT** process with whatever else you are attempting to `exec`. This is why you usually see any `exec()` calls paired with a `fork()` call just before it - otherwise we just throw out the code we're attempting to run, which defeats the point. That's not to say that couldn't be the point of a program, but we typically don't have you throw away the code you're writing in this class. 
 
 Much like with `fork()`, we suggest you error-check any `exec()` calls you make by simply throwing a `perror("<msg>")` and `exit(<some exit code>)` call **AFTER** the `exec()` call - something like this:
@@ -150,7 +156,11 @@ I'd just get whatever I put in the buffer. Make sure you're using the appropriat
 
 Some constraints: make sure your buffer is actually long enough to hold onto the message you're trying to put in there. Things will probably break otherwise. 
 
-### On using `pipe()`
+[Link back to TOC](#toc)
+
+<a id="pipe_notes"></a>
+
+## On using `pipe()`:
 Pipes are meant to be the primary means through which processes communicate with each other. Think about it - with completely isolated processes after calling `fork()`, how are you actually meant to get a message from one process to another? The only feasible way is through a shared file; and that's precisely what pipes are. 
 
 Remember that a `pipe` is a **unidirectional** channel of communication between two or more processes that share a common ancestor; that being the process who set up the pipe. So one end is strictly the **read** end (index 0) and one end is strictly the **write** end (index 1). 
@@ -187,7 +197,11 @@ Additionally, note that you need to be careful about how many bytes you write/re
 
 This is why we usually recommend reading and writing the same amount of bytes in your calls. 
 
-### On using `signal()`
+[Link back to TOC](#toc)
+
+<a id="signal_notes"></a>
+
+## On using `signal()`:
 Signal does not have as many complexities to it as some of the other functions that you'll use here. Remember that in order to properly use it, you'll need to provide it with:
 ```
 signal(<signal type>, signal_handler);
@@ -198,7 +212,27 @@ When you are using `signal`, make sure you are 100% aware of WHEN Linux generate
 
 You might also know about the `SIGSEGV` signal, which is a signal that is generated when a segmentation violation (more commonly, a segfault) occurs. Note that a segfault occurs when you try to access an invalid memory location; so it isn't technically 100% sufficient for handling crashes. A crash occurs whenever a program fails to exit altogether - this means things like memory leaks, stack smashing, etc. 
 
+[Link back to TOC](#toc)
 
+<a id="wait_notes"></a>
+
+## On using `wait()`, `waitpid()`, `exit()`:
+Remember that a good parent process should **ALWAYS** make sure that its child process exited. This is how you prevent zombie processes from going around and wreaking havoc. This is where the `wait()` family of functions come in, as they do exactly what their name entails.
+
+Here's something to consider on when exactly you should use `wait()` vs. `waitpid()`:
+- Is parallelism a big thing with this program you are going to be writing?
+    - If so, you'll want to consider using `waitpid()`.
+        - `waitpid()` allows you to wait on a process without being a direct parent of it; so you can go through, generate a whole bunch of processes, then not have to worry about which process generated another at what point. Just save the PIDs!
+    - If not, you'll want to consider using `wait()`.
+        - `wait()` only really works well if you are directly related to the process you just created via `fork()`, otherwise it may grab the wrong process to wait on. Note that this is equivalent to calling `waitpid(-1, &status, 0);` so it will work, but it doesn't allow you to target specific processes. 
+
+In either case, the parent process will stop execution of the program **UNTIL** the child process calls `exit()`, or runs out of lines to run in a function (if it doesn't return to somewhere else). 
+
+This is also why it is important to make sure your child process always exits. If it doesn't the parent process may get locked out of running its code for a while, not to mention the fact that you'll have a process running rogue through your code. 
+
+Also, remember your macros to get the exit status from a process - things like `WIFEXITED(status)`, or `WEXITSTATUS(status)`. These may come in handy on the exam!
+
+[Link back to TOC](#toc)
 
 
 
