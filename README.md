@@ -150,6 +150,44 @@ I'd just get whatever I put in the buffer. Make sure you're using the appropriat
 
 Some constraints: make sure your buffer is actually long enough to hold onto the message you're trying to put in there. Things will probably break otherwise. 
 
+### On using `pipe()`
+Pipes are meant to be the primary means through which processes communicate with each other. Think about it - with completely isolated processes after calling `fork()`, how are you actually meant to get a message from one process to another? The only feasible way is through a shared file; and that's precisely what pipes are. 
+
+Remember that a `pipe` is a **unidirectional** channel of communication between two or more processes that share a common ancestor; that being the process who set up the pipe. So one end is strictly the **read** end (index 0) and one end is strictly the **write** end (index 1). 
+
+To preserve the **unidirectional** nature of pipes, you should always close the end you are NOT going to use at the start of a particular process's code. If two processes are to communicate back and forth, you should utilize more than one pipe. In this class, we encourage you to explicitly close both ends in both the child and parent process. Ex:
+```
+if (pid == 0) {
+    // child
+    close(fd[0]);
+    ...
+    close(fd[1]);
+} else {
+    // parent
+    close(fd[1]);
+    ...
+    close(fd[0]);
+}
+```
+Additionally, it is vital that you call `pipe(...)` before you call `fork()`, otherwise the pipes will not get initialized correctly. 
+
+Something else to remember - when you are using `read` and `write` to interact with pipes, you have to remember some of the edge cases that come with using those functions.
+
+For `read`, remember that this is a blocking call - `read` will only return once either of the below things have happened:
+- Read has successfully gotten at least 1 byte of data out of the pipe 
+- All of the other writing ends of the pipe have been closed 
+    - If no data was in the pipe, read will not put anything in the buffer specified in the call.
+
+The second reason is why it is especially important to close your pipes! You don't want a `read` call to pause execution of everything else in your code.
+
+For `write`, there's really only one case in which it blocks:
+- The pipe is full
+
+Additionally, note that you need to be careful about how many bytes you write/read at any given time. These move the respective read and write pointers along the file, so if your read pointer is WAY ahead of your write pointer, you'll never get the chance to see that data, and will likely have your program stall.
+
+This is why we usually recommend reading and writing the same amount of bytes in your calls. 
+
+
 
 
 
