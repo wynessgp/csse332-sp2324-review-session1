@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <time.h>
 
 #define NUM_LEADERS 3 // you are free to change these, if you wish.
 #define NUM_SOLDIERS 3
@@ -16,6 +17,8 @@ int main(int argc, char** argv) {
     printf("You should not be calling ./armory.bin with args!\n");
     exit(999);
   }
+
+  srand(time(NULL));
 
   // TODO: Code this to the requirements!
 
