@@ -456,5 +456,16 @@ Main Process 6006 has confirmed that Leader 6008 left the armory!
 Main Process 6006 has confirmed that Leader 6010 left the armory!
 ```
 
+Some things to note about this output:
+- There are 9 lines in which a soldier receives the alotted amount of weapons.
+- There are 3 lines in which the Leader leaves, and the Main Process confirms it.
+- There are 18 lines in which a Leader says to retrieve a weapon number.
+    - Each weapon number is duplicated 3 times.
+- There are 18 lines in which a Soldier retrieves a weapon.
+
+This should help you with some of the lines of code you'll need to write.
+
+
+
 
 
