@@ -51,12 +51,13 @@ That being said, let's talk about your exam structure. Exam 1 is split as follow
 
 This means you have 50 minutes (if you do not have accomodations) on both parts of the exam. Be careful studying for this exam, as any of the sample exams posted as part of the `CSSE332` repo that are older than this year ('23-'24) used to be night exams that were 3 hours long. 
 
-In general, for the two parts you'll experience, you should anticipate getting one "overall" question on both days, split into two parts, as follows:
+In general, for the two parts you'll experience, you should anticipate getting one question on both days, split into two parts. You'll need to get both in order to earn an A on any given part; as both are worth 50% of the credit for any given part. 
+
+Here's how questions worked in the Winter, which may or may not be the same for this quarter. 
 - Part 1: Basics of the concepts. Enough to earn you a C if you get this correct.
 - Part 2: A little more advanced. You'll need to get this correct to earn an A.
-- Part 3: This only sometimes appears, but it will be for extra credit if it does.
 
-Note that both parts contribute to your overall Exam 1 grade, so make sure you are comfortable with all of the potential topics that can appear. If you get an A on one day of the exam, but completely fail the other part, the most you would be elgible for is a 100/200. Do your best!
+Note that both parts contribute to your overall Exam 1 grade, so make sure you are comfortable with all of the potential topics that can appear. If you get an A on one day of the exam, but completely fail the other part, the most you would be elgible for is a 50/100. Do your best!
 
 An additional thing to note - you'll be connecting to a remote server for this exam. Namely, you'll be using `ssh` to connect to a machine other than your own. 
 
