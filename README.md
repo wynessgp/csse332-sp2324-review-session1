@@ -370,7 +370,6 @@ Note that it doesn't matter which solider gets to retrieve the weapon first (nam
 ```
 Soldier <soldier PID> retrieved weapon <weapon number>!
 ```
-And then they should sleep for `2` seconds to model them taking it out of the army. 
 
 Once any soldier retrieves `NUM_WEAPONS_PER_SOLIDER`, they should print out:
 ```
@@ -378,22 +377,83 @@ Soldier <soldier PID> has retrieved the alotted amount of weapons!
 ```
 And then prompty exit.
 
-Once a leader has supervised handed out all of their orders on weapons to retrieve, they should promptly exit, printing the message:
+Once a leader has called out all of their orders on weapons to retrieve, they should promptly exit, printing the message:
 ```
 Leader <leader PID>'s job is done here!
 ```
 Just before they exit.
 
-Finally, come back up to our main process, once we've confirmed that a Leader has left, we should print out:
+Finally, coming back up to our main process, once we've confirmed that a Leader has left, we should print out:
 ```
 Main Process <main process PID> has confirmed that Leader <leader PID> left the armory!
 ```
 While there are a couple of different ways to achieve these print outs, I am going to strictly enforce this hierarchy for the sake of this problem. None of your processes should exit before they finish their job, and you should have **NO** zombies after the program is done running. 
 
+If you want to spice up when exactly a Leader says to retrieve a weapon (like I have in the output), you'll want to make the Leader sleep after writing a message into the pipe. I used:
+```
+sleep((rand % 3) + 1);
+```
+
+I've also left you one more `#define` statement, namely:
+```
+#define BUF_SIZE 16
+```
+I would recommend using this whenever you define character arrays, or read/write, as it'll help ensure that you move your pointers around a consistent amount each time.
+
 Like the other problems, you can use `make` to generate `./armory.bin`, which is what you'll need to use in order to run the program. Here's some sample output from me running it:
 ```
 $ ./armory.bin
-
+Leader 6007 says to retrieve weapon 1!                     
+Leader 6008 says to retrieve weapon 1!
+Soldier 6009 has retrieved weapon 1!
+Leader 6010 says to retrieve weapon 1!
+Soldier 6012 has retrieved weapon 1!
+Soldier 6014 has retrieved weapon 1!
+Leader 6007 says to retrieve weapon 2!
+Leader 6008 says to retrieve weapon 2!
+Soldier 6011 has retrieved weapon 2!
+Leader 6010 says to retrieve weapon 2!
+Soldier 6015 has retrieved weapon 2!
+Soldier 6016 has retrieved weapon 2!
+Leader 6007 says to retrieve weapon 3!
+Leader 6008 says to retrieve weapon 3!
+Leader 6010 says to retrieve weapon 3!
+Soldier 6013 has retrieved weapon 3!
+Soldier 6017 has retrieved weapon 3!
+Soldier 6018 has retrieved weapon 3!
+Leader 6007 says to retrieve weapon 4!
+Leader 6008 says to retrieve weapon 4!
+Soldier 6012 has retrieved weapon 4!
+Soldier 6012 has retrieved the alotted amount of weapons!
+Leader 6010 says to retrieve weapon 4!
+Soldier 6009 has retrieved weapon 4!
+Soldier 6009 has retrieved the alotted amount of weapons!
+Soldier 6014 has retrieved weapon 4!
+Soldier 6014 has retrieved the alotted amount of weapons!
+Leader 6008 says to retrieve weapon 5!
+Leader 6007 says to retrieve weapon 5!
+Soldier 6015 has retrieved weapon 5!
+Soldier 6015 has retrieved the alotted amount of weapons!
+Soldier 6011 has retrieved weapon 5!
+Leader 6010 says to retrieve weapon 5!
+Soldier 6011 has retrieved the alotted amount of weapons!
+Soldier 6016 has retrieved weapon 5!
+Soldier 6016 has retrieved the alotted amount of weapons!
+Leader 6008 says to retrieve weapon 6!
+Leader 6007 says to retrieve weapon 6!
+Soldier 6017 has retrieved weapon 6!
+Leader 6010 says to retrieve weapon 6!
+Soldier 6013 has retrieved weapon 6!
+Soldier 6013 has retrieved the alotted amount of weapons!
+Soldier 6017 has retrieved the alotted amount of weapons!
+Soldier 6018 has retrieved weapon 6!
+Soldier 6018 has retrieved the alotted amount of weapons!
+Leader 6008's job is done here!
+Leader 6007's job is done here!
+Leader 6010's job is done here!
+Main Process 6006 has confirmed that Leader 6007 left the armory!
+Main Process 6006 has confirmed that Leader 6008 left the armory!
+Main Process 6006 has confirmed that Leader 6010 left the armory!
 ```
 
 
