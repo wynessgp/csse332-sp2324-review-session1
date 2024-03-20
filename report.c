@@ -10,6 +10,7 @@ int main(int argc, char **argv) {
   }	
 
   int scout_pid = atoi(argv[1]);
+  int* my_bogus_ptr = 0;
 
   printf("Scout %d is leaving the camp!\n", scout_pid);
 
@@ -34,7 +35,6 @@ int main(int argc, char **argv) {
 
     case 3:
       // TODO: Use this print: printf("Oh tragic day! The scout never returned!\n");
-      int* my_bogus_ptr = 0;
       *my_bogus_ptr = 5; // scary!
 
     default: // should never happen
